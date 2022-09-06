@@ -4,6 +4,7 @@ from exiftool import ExifToolHelper
 import matplotlib.pyplot as plt
 import rasterio
 from rasterio.transform import Affine
+import utm
 
 
 class CameraInformationFromExif():
@@ -299,8 +300,8 @@ def main(filename):
     print(Z.shape)
     res = 0.05 # Resolution
     # global position of upper left corner (x, y)
-    x = 240649.96
-    y = 6274243.29
+    print(utm.from_latlon(cife.latitude, cife.longitude))
+    x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
     x = x + 0.5 * res
     y = y - 0.5 * res
     transform = Affine.translation(x, y) * Affine.scale(res, -res)
@@ -313,7 +314,7 @@ def main(filename):
         count=3,
         dtype=Z.dtype,
         #crs='+proj=epsg:25832',
-        crs=rasterio.crs.CRS.from_epsg(2196),
+        crs=rasterio.crs.CRS.from_epsg(32632),
         transform=transform,
         nodata=0,
     ) as dst:
