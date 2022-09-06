@@ -1,12 +1,6 @@
 from exiftool import ExifToolHelper
 with ExifToolHelper() as et:
     filename = "input/DJI_0177.JPG"
-    for d in et.get_metadata(filename):
-        for k, v in d.items():
-            print(f"Dict: {k} = {v}")
-
-
-    print("Testing")
     tags = et.get_metadata(filename)
 
     keys = ["XMP:GimbalRollDegree",
@@ -18,7 +12,9 @@ with ExifToolHelper() as et:
             "Composite:GPSLatitude",
             "Composite:GPSLongitude",
             "XMP:AbsoluteAltitude",
-            "XMP:RelativeAltitude"]
+            "XMP:RelativeAltitude",
+            "EXIF:ExifImageWidth",
+            "EXIF:ExifImageHeight"]
 
 
     for key in keys:
