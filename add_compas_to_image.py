@@ -261,9 +261,37 @@ def main(filename):
     ax.set_ylabel('Forward / Backward (y)')
     ax.set_zlabel('Up / down (z)')
 
-    ax.auto_scale_xyz([-3, 3]*50, [0, 6]*50, [-3, 3]*50)
+    #ax.auto_scale_xyz([-3, 3]*150, [0, 6]*150, [-3, 3]*150)
     plt.savefig("output/04projecttoground.png")
     plt.show()
+
+    ##
+    # Determine perspective transform from image plane to ground plane
+
+    image_corners = np.float32([
+            [cife.image_width, cife.image_height], 
+            [cife.image_width, 0],
+            [0, 0], 
+            [0, cife.image_height], 
+            ])
+    print(image_corners)
+    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*2
+    print(transformed_image_corners)
+
+
+    im_points = np.array([[-np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
+                          [-np.tan(vfov / 2), 1, np.tan(hfov / 2)],
+                          [np.tan(vfov / 2), 1, np.tan(hfov / 2)],
+                          [np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
+                          [-np.tan(vfov / 2), 1, -np.tan(hfov / 2)]])
+    srcpts = np.float32([[0, 100], [700, 260], [0, 700], [700, 400]])
+    destpts = np.float32([[0, 200], [600, 0], [0, 700], [1000, 700]])
+    resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
+
+    img = cv2.imread(filename)
+    resultimage = cv2.warpPerspective(img, resmatrix, (600, 600))
+    cv2.imwrite("output/05transformed_image.jpg", resultimage)
+
 
     
 
