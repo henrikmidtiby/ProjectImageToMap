@@ -49,9 +49,6 @@ def main(filename):
     cife.extract_data_from_image(filename)
     print(cife)
 
-    print(cife.yaw)
-    print(cife.yaw * np.pi / 180)
-
 
     # Calculations all take place in the Universal Transverse Mercator (UTM)
     # coordinate system \addref{}, where $x$ is displacement towards east,
@@ -88,7 +85,7 @@ def main(filename):
 
 
     # Yaw is rotation around the $z$ axis (up / down)
-    yaw_matrix = get_yaw_matrix(yaw_angle=cife.yaw * np.pi / 180)
+    yaw_matrix = get_yaw_matrix(yaw_angle=-cife.yaw * np.pi / 180)
 
     # Pitch is rotation around the x axis (right / left)
     pitch_matrix = get_pitch_matrix(pitch_angle=cife.pitch * np.pi / 180)
@@ -275,7 +272,10 @@ def main(filename):
             [0, cife.image_height], 
             ])
     print(image_corners)
-    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*2
+    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*5
+    print(transformed_image_corners)
+    transformed_image_corners[:, 0] = transformed_image_corners[:, 0] + 1500
+    transformed_image_corners[:, 1] = transformed_image_corners[:, 1] + 1500
     print(transformed_image_corners)
 
 
@@ -284,13 +284,12 @@ def main(filename):
                           [np.tan(vfov / 2), 1, np.tan(hfov / 2)],
                           [np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
                           [-np.tan(vfov / 2), 1, -np.tan(hfov / 2)]])
-    srcpts = np.float32([[0, 100], [700, 260], [0, 700], [700, 400]])
-    destpts = np.float32([[0, 200], [600, 0], [0, 700], [1000, 700]])
     resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
 
     img = cv2.imread(filename)
-    resultimage = cv2.warpPerspective(img, resmatrix, (600, 600))
+    resultimage = cv2.warpPerspective(img, resmatrix, (5600, 5600))
     cv2.imwrite("output/05transformed_image.jpg", resultimage)
+    cv2.imwrite("output/05transformed_image_rotated.jpg", cv2.rotate(resultimage, cv2.ROTATE_180))
 
 
     
