@@ -127,7 +127,7 @@ def main(filename):
 
     ax.auto_scale_xyz([-1, 1], [-1, 1], [-1, 1])
     plt.savefig("output/01imageplane.png")
-    plt.show()
+    #plt.show()
 
     # Press q to close the plot
 
@@ -160,7 +160,7 @@ def main(filename):
 
     ax.auto_scale_xyz([-1, 1], [-1, 1], [-1, 1])
     plt.savefig("output/02correctyaw.png")
-    plt.show()
+    #plt.show()
 
 
     # Rotate the viewpoint according to the full pose matrix
@@ -191,7 +191,7 @@ def main(filename):
 
     ax.auto_scale_xyz([-1, 1], [-1, 1], [-1, 1])
     plt.savefig("output/03fullrotationcorrection.png")
-    plt.show()
+    #plt.show()
 
 
 
@@ -260,7 +260,7 @@ def main(filename):
 
     #ax.auto_scale_xyz([-3, 3]*150, [0, 6]*150, [-3, 3]*150)
     plt.savefig("output/04projecttoground.png")
-    plt.show()
+    #plt.show()
 
     ##
     # Determine perspective transform from image plane to ground plane
