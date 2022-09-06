@@ -275,9 +275,9 @@ def main(filename):
             [0, cife.image_height], 
             ])
     print(image_corners)
-    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*5
+    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*15
     print(transformed_image_corners)
-    transformed_image_corners[:, 0] = transformed_image_corners[:, 0] + 1500
+    transformed_image_corners[:, 0] = transformed_image_corners[:, 0] + 6000
     transformed_image_corners[:, 1] = transformed_image_corners[:, 1] + 1500
     print(transformed_image_corners)
 
