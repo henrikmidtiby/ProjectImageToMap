@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from exiftool import ExifToolHelper
 import matplotlib.pyplot as plt
+import rasterio
+from rasterio.transform import Affine
 
 
 class CameraInformationFromExif():
@@ -289,8 +291,33 @@ def main(filename):
     img = cv2.imread(filename)
     resultimage = cv2.warpPerspective(img, resmatrix, (5600, 5600))
     cv2.imwrite("output/05transformed_image.jpg", resultimage)
-    cv2.imwrite("output/05transformed_image_rotated.jpg", cv2.rotate(resultimage, cv2.ROTATE_180))
+    result_image_rotated = cv2.rotate(resultimage, cv2.ROTATE_180)
+    cv2.imwrite("output/05transformed_image_rotated.jpg", result_image_rotated)
 
+
+    Z = result_image_rotated.transpose(2, 0, 1)
+    print(Z.shape)
+    res = 0.05 # Resolution
+    # global position of upper left corner (x, y)
+    x = 240649.96
+    y = 6274243.29
+    x = x + 0.5 * res
+    y = y - 0.5 * res
+    transform = Affine.translation(x, y) * Affine.scale(res, -res)
+    with rasterio.open(
+        'new.tif',
+        'w',
+        driver='GTiff',
+        height=Z.shape[1],
+        width=Z.shape[2],
+        count=3,
+        dtype=Z.dtype,
+        #crs='+proj=epsg:25832',
+        crs=rasterio.crs.CRS.from_epsg(2196),
+        transform=transform,
+        nodata=0,
+    ) as dst:
+        dst.write(Z)
 
     
 
