@@ -98,10 +98,8 @@ def main(filename):
 
     R_pose = np.matmul(yaw_matrix, np.matmul(pitch_matrix, roll_matrix))
 
-    # print(combined_pose_matrix)
-    # TODO: Get values from the focal length
-    hfov = 41.22 * np.pi / 180
-    vfov = 70.67 * np.pi / 180
+    hfov = 2*np.arctan(cife.image_height / 2 / cife.focallength)
+    vfov = 2*np.arctan(cife.image_width / 2 / cife.focallength)
     im_points = np.array([[-np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
                           [-np.tan(vfov / 2), 1, np.tan(hfov / 2)],
                           [np.tan(vfov / 2), 1, np.tan(hfov / 2)],
