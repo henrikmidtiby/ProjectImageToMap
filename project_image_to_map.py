@@ -155,12 +155,11 @@ def main(filename):
         'new.tif',
         'w',
         driver='GTiff',
-        height=Z.shape[1],
-        width=Z.shape[2],
+        height=Z.shape[2],
+        width=Z.shape[1],
         count=3,
         dtype=Z.dtype,
-        #crs='+proj=epsg:25832',
-        crs=rasterio.crs.CRS.from_epsg(32632),
+        crs=rasterio.crs.CRS.from_epsg(32632), # UTM 32N - This matches well here in Denmark.
         transform=transform,
         nodata=0,
     ) as dst:
@@ -168,6 +167,7 @@ def main(filename):
 
     
 
+filename = "input/DJI_0016.JPG"
 filename = "input/DJI_0177.JPG"
 main(filename)
 
