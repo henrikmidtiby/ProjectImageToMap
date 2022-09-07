@@ -50,7 +50,7 @@ class CameraInformationFromExif():
 def main(filename):
     cife = CameraInformationFromExif()
     cife.extract_data_from_image(filename)
-    print(cife)
+    #print(cife)
 
 
     # Calculations all take place in the Universal Transverse Mercator (UTM)
@@ -106,95 +106,7 @@ def main(filename):
                           [np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
                           [-np.tan(vfov / 2), 1, -np.tan(hfov / 2)]])
     im_points = np.transpose(im_points)
-
-
-    # Show the image plane in front of the camera
-    # ===========================================
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    plt.title('Image plane in front of camera')
-    # Camera
-    ax.scatter(0, 0, 0)
-
-    # Viewport in front of camera
-    ax.plot(im_points[0, :],
-            im_points[1, :],
-            im_points[2, :],
-            color='red')
-
-    ax.set_xlabel('Right / Left (x)')
-    ax.set_ylabel('Forward / Backward (y)')
-    ax.set_zlabel('Up / down (z)')
-
-    ax.auto_scale_xyz([-1, 1], [-1, 1], [-1, 1])
-    plt.savefig("output/01imageplane.png")
-    #plt.show()
-
-    # Press q to close the plot
-
-
-    # Rotate the viewpoint according to the yaw rotation matrix
-    # =========================================================
-    yaw_corrected_points = np.matmul(yaw_matrix, im_points)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    plt.title('Correcting yaw')
-    # Camera
-    ax.scatter(0, 0, 0)
-
-    # Viewport in front of camera
-    ax.plot(im_points[0, :],
-            im_points[1, :],
-            im_points[2, :],
-            color='red')
-
-    # Viewport in front of camera
-    ax.plot(yaw_corrected_points[0, :],
-            yaw_corrected_points[1, :],
-            yaw_corrected_points[2, :],
-            color='blue')
-
-    ax.set_xlabel('Right / Left (x)')
-    ax.set_ylabel('Forward / Backward (y)')
-    ax.set_zlabel('Up / down (z)')
-
-    ax.auto_scale_xyz([-1, 1], [-1, 1], [-1, 1])
-    plt.savefig("output/02correctyaw.png")
-    #plt.show()
-
-
-    # Rotate the viewpoint according to the full pose matrix
-    # ======================================================
     directions = np.matmul(R_pose, im_points)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    plt.title('Full camera rotation (yaw, pitch, roll)')
-    # Camera
-    ax.scatter(0, 0, 0)
-
-    # Viewport in front of camera
-    ax.plot(im_points[0, :],
-            im_points[1, :],
-            im_points[2, :],
-            color='red')
-
-    # Rotated viewport
-    ax.plot(directions[0, :],
-            directions[1, :],
-            directions[2, :],
-            color='blue')
-
-    ax.set_xlabel('Right / Left (x)')
-    ax.set_ylabel('Forward / Backward (y)')
-    ax.set_zlabel('Up / down (z)')
-
-    ax.auto_scale_xyz([-1, 1], [-1, 1], [-1, 1])
-    plt.savefig("output/03fullrotationcorrection.png")
-    #plt.show()
-
-
 
     # Project image plane on the ground
     altitude = cife.altitude
@@ -205,65 +117,6 @@ def main(filename):
     scaling_factor_matrix = np.diag(scaling_factors[0])
     corners_on_ground = np.matmul(directions, scaling_factor_matrix)
 
-    with np.printoptions(precision=3, suppress=True):
-        print("yaw_matrix")
-        print(yaw_matrix)
-        print("pitch_matrix")
-        print(pitch_matrix)
-        print("roll_matrix")
-        print(roll_matrix)
-        print("R_pose")
-        print(R_pose)
-        print("im_points:")
-        print(im_points)
-        print("Directions:")
-        print(directions)
-        print("z_components:")
-        print(z_components)
-        print("scaling_factors:")
-        print(scaling_factors)
-        print("scaling_factor_matrix")
-        print(scaling_factor_matrix)
-        print("corners_on_ground")
-        print(corners_on_ground)
-
-
-    # Extend the vectors to the ground plane
-    # ======================================
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    plt.title('Extend vectors to ground plane')
-    # Camera
-    ax.scatter(0, 0, 0)
-
-    # Viewport in front of camera
-    ax.plot(im_points[0, :],
-            im_points[1, :],
-            im_points[2, :],
-            color='red')
-
-    # Rotated viewport
-    ax.plot(directions[0, :],
-            directions[1, :],
-            directions[2, :],
-            color='blue')
-
-    # Rotated viewport
-    ax.plot(corners_on_ground[0, :],
-            corners_on_ground[1, :],
-            corners_on_ground[2, :],
-            color='black')
-
-    ax.set_xlabel('Right / Left (x)')
-    ax.set_ylabel('Forward / Backward (y)')
-    ax.set_zlabel('Up / down (z)')
-
-    #ax.auto_scale_xyz([-3, 3]*150, [0, 6]*150, [-3, 3]*150)
-    plt.savefig("output/04projecttoground.png")
-    #plt.show()
-
-    ##
     # Determine perspective transform from image plane to ground plane
 
     image_corners = np.float32([
