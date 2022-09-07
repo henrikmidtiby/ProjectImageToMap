@@ -125,7 +125,8 @@ def main(filename):
             [0, 0], 
             [0, cife.image_height], 
             ])
-    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*15
+    GSD = 0.10
+    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32) / GSD
     lower_bb_coord = transformed_image_corners.min(0)
     higher_bb_coord = transformed_image_corners.max(0)
     bb_size = np.ceil(higher_bb_coord - lower_bb_coord)
@@ -143,8 +144,7 @@ def main(filename):
 
 
     Z = result_image_rotated.transpose(2, 0, 1)
-    print(Z.shape)
-    res = 0.05 # Resolution
+    res = GSD # Resolution
     # global position of upper left corner (x, y)
     print(utm.from_latlon(cife.latitude, cife.longitude))
     x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
