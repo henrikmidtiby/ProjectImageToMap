@@ -273,15 +273,17 @@ def main(filename):
             [0, cife.image_height], 
             ])
     transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*15
-    print(transformed_image_corners)
-    transformed_image_corners[:, 0] = transformed_image_corners[:, 0] + 6000
-    transformed_image_corners[:, 1] = transformed_image_corners[:, 1] + 1500
+    lower_bb_coord = transformed_image_corners.min(0)
+    higher_bb_coord = transformed_image_corners.max(0)
+    bb_size = np.ceil(higher_bb_coord - lower_bb_coord)
+    transformed_image_corners = transformed_image_corners - np.repeat([lower_bb_coord], 4, axis=0)
 
 
     resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
 
     img = cv2.imread(filename)
-    resultimage = cv2.warpPerspective(img, resmatrix, (5600, 5600))
+    result_image_size = (int(bb_size[0]), int(bb_size[1]))
+    resultimage = cv2.warpPerspective(img, resmatrix, result_image_size)
     cv2.imwrite("output/05transformed_image.jpg", resultimage)
     result_image_rotated = cv2.rotate(resultimage, cv2.ROTATE_180)
     cv2.imwrite("output/05transformed_image_rotated.jpg", result_image_rotated)
@@ -294,7 +296,7 @@ def main(filename):
     print(utm.from_latlon(cife.latitude, cife.longitude))
     x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
     x = x + 0.5 * res
-    y = y - 0.5 * res
+    y = y - 0.5 * res + (bb_size[1] - lower_bb_coord[1]) * res
     transform = Affine.translation(x, y) * Affine.scale(res, -res)
     with rasterio.open(
         'new.tif',
