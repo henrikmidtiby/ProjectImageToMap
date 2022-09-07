@@ -274,19 +274,12 @@ def main(filename):
             [0, 0], 
             [0, cife.image_height], 
             ])
-    print(image_corners)
     transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32)*15
     print(transformed_image_corners)
     transformed_image_corners[:, 0] = transformed_image_corners[:, 0] + 6000
     transformed_image_corners[:, 1] = transformed_image_corners[:, 1] + 1500
-    print(transformed_image_corners)
 
 
-    im_points = np.array([[-np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
-                          [-np.tan(vfov / 2), 1, np.tan(hfov / 2)],
-                          [np.tan(vfov / 2), 1, np.tan(hfov / 2)],
-                          [np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
-                          [-np.tan(vfov / 2), 1, -np.tan(hfov / 2)]])
     resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
 
     img = cv2.imread(filename)
