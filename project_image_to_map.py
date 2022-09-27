@@ -46,94 +46,109 @@ class CameraInformationFromExif():
         return f"{self.latitude} {self.longitude} {self.altitude} {self.yaw} {self.pitch:8.3f} {self.roll}"
 
 
+class ProjectImageToGround():
+    def __init__(self): 
+        pass
+
+    def set_camera_information(self, camera_information):
+        self.camera_information = camera_information
+
+    def calculate_projection_transform(self):
+
+        # Calculations all take place in the Universal Transverse Mercator (UTM)
+        # coordinate system \addref{}, where $x$ is displacement towards east,
+        # $y$ is displacement towards north and $z$ is the altitude above sea level.
+    
+        # The orientation of the camera is described by
+        # the three rotation angles: $yaw$, $pitch$ and $roll$.
+        # Assuming that the camera is pointing towards the horizon,
+        # the \emph{yaw} values is the compass heading that the camera is looking towards,
+        # e.g. $yaw = 0\degree$ is towards north and $yaw = 45\degree$ is towards north east.
+        # The camera $pitch$ is the angle of the camera relative to the horizon,
+        # when $pitch = 0\degree$ the camera is looking directly forward and when
+        # $pitch = -90\degree$ the camera is looking directly towards the ground.
+        # The $roll$ values is how much the horizon is away from being horizontal;
+        # this will in practice often be zero as the camera gimbal ensures that.
+    
+    
+        def get_yaw_matrix(yaw_angle):
+            return np.array([[np.cos(yaw_angle), np.sin(yaw_angle), 0],
+                             [-np.sin(yaw_angle), np.cos(yaw_angle), 0],
+                             [0, 0, 1]])
+    
+    
+        def get_pitch_matrix(pitch_angle):
+            return np.array([[1, 0, 0],
+                             [0, np.cos(pitch_angle), -np.sin(pitch_angle)],
+                             [0, np.sin(pitch_angle), np.cos(pitch_angle)]])
+    
+    
+        def get_roll_matrix(roll_angle):
+            return np.array([[np.cos(roll_angle), 0, np.sin(roll_angle)],
+                             [0, 1, 0],
+                             [-np.sin(roll_angle), 0, np.cos(roll_angle)]])
+    
+    
+        # Yaw is rotation around the $z$ axis (up / down)
+        yaw_matrix = get_yaw_matrix(yaw_angle=-self.camera_information.yaw * np.pi / 180)
+    
+        # Pitch is rotation around the x axis (right / left)
+        pitch_matrix = get_pitch_matrix(pitch_angle=self.camera_information.pitch * np.pi / 180)
+    
+        # Roll is rotation around the y axis (forward / back)
+        roll_matrix = get_roll_matrix(roll_angle=self.camera_information.roll * np.pi / 180)
+    
+        R_pose = np.matmul(yaw_matrix, np.matmul(pitch_matrix, roll_matrix))
+    
+        hfov = 2*np.arctan(self.camera_information.image_height / 2 / self.camera_information.focallength)
+        vfov = 2*np.arctan(self.camera_information.image_width / 2 / self.camera_information.focallength)
+        im_points = np.array([[-np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
+                              [-np.tan(vfov / 2), 1, np.tan(hfov / 2)],
+                              [np.tan(vfov / 2), 1, np.tan(hfov / 2)],
+                              [np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
+                              [-np.tan(vfov / 2), 1, -np.tan(hfov / 2)]])
+        im_points = np.transpose(im_points)
+        directions = np.matmul(R_pose, im_points)
+    
+        # Project image plane on the ground
+        altitude = self.camera_information.altitude
+        down = np.array([[0, 0, -1]])
+    
+        z_components = np.matmul(down, directions)
+        scaling_factors = altitude / z_components
+        scaling_factor_matrix = np.diag(scaling_factors[0])
+        corners_on_ground = np.matmul(directions, scaling_factor_matrix)
+    
+        # Determine perspective transform from image plane to ground plane
+    
+        image_corners = np.float32([
+                [self.camera_information.image_width, self.camera_information.image_height], 
+                [self.camera_information.image_width, 0],
+                [0, 0], 
+                [0, self.camera_information.image_height], 
+                ])
+        transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32) / self.GSD
+        lower_bb_coord = transformed_image_corners.min(0)
+        higher_bb_coord = transformed_image_corners.max(0)
+        bb_size = np.ceil(higher_bb_coord - lower_bb_coord)
+        transformed_image_corners = transformed_image_corners - np.repeat([lower_bb_coord], 4, axis=0)
+    
+        resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
+        return resmatrix, bb_size, lower_bb_coord
+    
+
+
 
 def main(filename):
     cife = CameraInformationFromExif()
     cife.extract_data_from_image(filename)
-    #print(cife)
+
+    pitg = ProjectImageToGround()
+    pitg.set_camera_information(cife)
+    pitg.GSD = 0.10
+    resmatrix, bb_size, lower_bb_coord = pitg.calculate_projection_transform()
 
 
-    # Calculations all take place in the Universal Transverse Mercator (UTM)
-    # coordinate system \addref{}, where $x$ is displacement towards east,
-    # $y$ is displacement towards north and $z$ is the altitude above sea level.
-
-    # The orientation of the camera is described by
-    # the three rotation angles: $yaw$, $pitch$ and $roll$.
-    # Assuming that the camera is pointing towards the horizon,
-    # the \emph{yaw} values is the compass heading that the camera is looking towards,
-    # e.g. $yaw = 0\degree$ is towards north and $yaw = 45\degree$ is towards north east.
-    # The camera $pitch$ is the angle of the camera relative to the horizon,
-    # when $pitch = 0\degree$ the camera is looking directly forward and when
-    # $pitch = -90\degree$ the camera is looking directly towards the ground.
-    # The $roll$ values is how much the horizon is away from being horizontal;
-    # this will in practice often be zero as the camera gimbal ensures that.
-
-
-    def get_yaw_matrix(yaw_angle):
-        return np.array([[np.cos(yaw_angle), np.sin(yaw_angle), 0],
-                         [-np.sin(yaw_angle), np.cos(yaw_angle), 0],
-                         [0, 0, 1]])
-
-
-    def get_pitch_matrix(pitch_angle):
-        return np.array([[1, 0, 0],
-                         [0, np.cos(pitch_angle), -np.sin(pitch_angle)],
-                         [0, np.sin(pitch_angle), np.cos(pitch_angle)]])
-
-
-    def get_roll_matrix(roll_angle):
-        return np.array([[np.cos(roll_angle), 0, np.sin(roll_angle)],
-                         [0, 1, 0],
-                         [-np.sin(roll_angle), 0, np.cos(roll_angle)]])
-
-
-    # Yaw is rotation around the $z$ axis (up / down)
-    yaw_matrix = get_yaw_matrix(yaw_angle=-cife.yaw * np.pi / 180)
-
-    # Pitch is rotation around the x axis (right / left)
-    pitch_matrix = get_pitch_matrix(pitch_angle=cife.pitch * np.pi / 180)
-
-    # Roll is rotation around the y axis (forward / back)
-    roll_matrix = get_roll_matrix(roll_angle=cife.roll * np.pi / 180)
-
-    R_pose = np.matmul(yaw_matrix, np.matmul(pitch_matrix, roll_matrix))
-
-    hfov = 2*np.arctan(cife.image_height / 2 / cife.focallength)
-    vfov = 2*np.arctan(cife.image_width / 2 / cife.focallength)
-    im_points = np.array([[-np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
-                          [-np.tan(vfov / 2), 1, np.tan(hfov / 2)],
-                          [np.tan(vfov / 2), 1, np.tan(hfov / 2)],
-                          [np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
-                          [-np.tan(vfov / 2), 1, -np.tan(hfov / 2)]])
-    im_points = np.transpose(im_points)
-    directions = np.matmul(R_pose, im_points)
-
-    # Project image plane on the ground
-    altitude = cife.altitude
-    down = np.array([[0, 0, -1]])
-
-    z_components = np.matmul(down, directions)
-    scaling_factors = altitude / z_components
-    scaling_factor_matrix = np.diag(scaling_factors[0])
-    corners_on_ground = np.matmul(directions, scaling_factor_matrix)
-
-    # Determine perspective transform from image plane to ground plane
-
-    image_corners = np.float32([
-            [cife.image_width, cife.image_height], 
-            [cife.image_width, 0],
-            [0, 0], 
-            [0, cife.image_height], 
-            ])
-    GSD = 0.10
-    transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32) / GSD
-    lower_bb_coord = transformed_image_corners.min(0)
-    higher_bb_coord = transformed_image_corners.max(0)
-    bb_size = np.ceil(higher_bb_coord - lower_bb_coord)
-    transformed_image_corners = transformed_image_corners - np.repeat([lower_bb_coord], 4, axis=0)
-
-
-    resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
 
     img = cv2.imread(filename)
     result_image_size = (int(bb_size[0]), int(bb_size[1]))
@@ -144,7 +159,7 @@ def main(filename):
 
 
     Z = result_image_rotated.transpose(2, 0, 1)
-    res = GSD # Resolution
+    res = pitg.GSD # Resolution
     # global position of upper left corner (x, y)
     print(utm.from_latlon(cife.latitude, cife.longitude))
     x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
