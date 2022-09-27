@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import rasterio
 from rasterio.transform import Affine
 import utm
+import argparse
 
 
 class CameraInformationFromExif():
@@ -139,7 +140,7 @@ class ProjectImageToGround():
 
 
 
-def main(filename):
+def handle_image(filename):
     cife = CameraInformationFromExif()
     cife.extract_data_from_image(filename)
 
@@ -181,9 +182,18 @@ def main(filename):
         dst.write(Z)
 
     
+def main():
+    parser = argparse.ArgumentParser(description='Project image down to ground plane')
+    parser.add_argument('input_filename', type=str,
+                        help='path to file')
+    
+    args = parser.parse_args()
+    handle_image(args.input_filename)
 
-filename = "input/DJI_0016.JPG"
-filename = "input/DJI_0177.JPG"
-main(filename)
+    #filename = "input/DJI_0016.JPG"
+    #filename = "input/DJI_0177.JPG"
+    #handle_image(filename)
 
+main()
+    
 
