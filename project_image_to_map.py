@@ -140,18 +140,17 @@ class ProjectImageToGround():
 
 
 
-def handle_image(filename):
+def handle_image(input_filename, output_filename):
     cife = CameraInformationFromExif()
-    cife.extract_data_from_image(filename)
+    cife.extract_data_from_image(input_filename)
 
     pitg = ProjectImageToGround()
     pitg.set_camera_information(cife)
-    pitg.GSD = 0.10
+    pitg.GSD = 0.05
     resmatrix, bb_size, lower_bb_coord = pitg.calculate_projection_transform()
 
 
-
-    img = cv2.imread(filename)
+    img = cv2.imread(input_filename)
     result_image_size = (int(bb_size[0]), int(bb_size[1]))
     resultimage = cv2.warpPerspective(img, resmatrix, result_image_size)
     cv2.imwrite("output/05transformed_image.jpg", resultimage)
@@ -168,7 +167,7 @@ def handle_image(filename):
     y = y - 0.5 * res + (bb_size[1] - lower_bb_coord[1]) * res
     transform = Affine.translation(x, y) * Affine.scale(res, -res)
     with rasterio.open(
-        'new.tif',
+        output_filename,
         'w',
         driver='GTiff',
         height=Z.shape[2],
@@ -178,6 +177,7 @@ def handle_image(filename):
         crs=rasterio.crs.CRS.from_epsg(32632), # UTM 32N - This matches well here in Denmark.
         transform=transform,
         nodata=0,
+        compress='lzw',
     ) as dst:
         dst.write(Z)
 
@@ -186,13 +186,12 @@ def main():
     parser = argparse.ArgumentParser(description='Project image down to ground plane')
     parser.add_argument('input_filename', type=str,
                         help='path to file')
+    parser.add_argument('output_filename', type=str,
+                        help='path to file (include .tif)')
     
     args = parser.parse_args()
-    handle_image(args.input_filename)
+    handle_image(args.input_filename, args.output_filename)
 
-    #filename = "input/DJI_0016.JPG"
-    #filename = "input/DJI_0177.JPG"
-    #handle_image(filename)
 
 main()
     
