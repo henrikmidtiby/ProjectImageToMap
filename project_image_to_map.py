@@ -145,13 +145,13 @@ class ProjectImageToGround():
 
 
 
-def handle_image(input_filename, output_filename):
+def handle_image(input_filename, output_filename, gsd):
     cife = CameraInformationFromExif()
     cife.extract_data_from_image(input_filename)
 
     pitg = ProjectImageToGround()
     pitg.set_camera_information(cife)
-    pitg.GSD = 0.05
+    pitg.GSD = gsd
     resmatrix, bb_size, lower_bb_coord, transformed_image_corners_raw = pitg.calculate_projection_transform()
     lower_bb_coord = transformed_image_corners_raw.min(0)
     higher_bb_coord = transformed_image_corners_raw.max(0)
@@ -195,9 +195,11 @@ def main():
                         help='path to file')
     parser.add_argument('output_filename', type=str,
                         help='path to file (include .tif)')
+    parser.add_argument('--gsd', type=float, default=0.05, 
+                        help='ground sample distance in meters')
     
     args = parser.parse_args()
-    handle_image(args.input_filename, args.output_filename)
+    handle_image(args.input_filename, args.output_filename, args.gsd)
 
 
 main()
