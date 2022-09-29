@@ -129,11 +129,11 @@ class ProjectImageToGround():
                 [0, 0], 
                 [0, self.camera_information.image_height], 
                 ])
-        transformed_image_corners = corners_on_ground[0:2, 0:4].transpose().astype(np.float32) / self.GSD
-        lower_bb_coord = transformed_image_corners.min(0)
-        higher_bb_coord = transformed_image_corners.max(0)
+        transformed_image_corners_raw = corners_on_ground[0:2, 0:4].transpose().astype(np.float32) / self.GSD
+        lower_bb_coord = transformed_image_corners_raw.min(0)
+        higher_bb_coord = transformed_image_corners_raw.max(0)
         bb_size = np.ceil(higher_bb_coord - lower_bb_coord)
-        transformed_image_corners = transformed_image_corners - np.repeat([lower_bb_coord], 4, axis=0)
+        transformed_image_corners = transformed_image_corners_raw - np.repeat([lower_bb_coord], 4, axis=0)
     
         resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
         return resmatrix, bb_size, lower_bb_coord
