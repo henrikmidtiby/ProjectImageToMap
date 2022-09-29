@@ -170,8 +170,8 @@ def handle_image(input_filename, output_filename):
     # global position of upper left corner (x, y)
     print(utm.from_latlon(cife.latitude, cife.longitude))
     x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
-    x = x + 0.5 * res - higher_bb_coord[0] * res
-    y = y - 0.5 * res + higher_bb_coord[1] * res
+    x = x + 0.5 * res - higher_bb_coord[0] * res # East - West
+    y = y - 0.5 * res + higher_bb_coord[1] * res # North - South
     transform = Affine.translation(x, y) * Affine.scale(res, -res)
     with rasterio.open(
         output_filename,
