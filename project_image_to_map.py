@@ -136,7 +136,7 @@ class ProjectImageToGround():
         transformed_image_corners = transformed_image_corners_raw - np.repeat([lower_bb_coord], 4, axis=0)
     
         resmatrix = cv2.getPerspectiveTransform(image_corners, transformed_image_corners)
-        return resmatrix, bb_size, lower_bb_coord
+        return resmatrix, bb_size, lower_bb_coord, transformed_image_corners_raw
     
 
 
@@ -148,7 +148,9 @@ def handle_image(input_filename, output_filename):
     pitg = ProjectImageToGround()
     pitg.set_camera_information(cife)
     pitg.GSD = 0.05
-    resmatrix, bb_size, lower_bb_coord = pitg.calculate_projection_transform()
+    resmatrix, bb_size, lower_bb_coord, transformed_image_corners_raw = pitg.calculate_projection_transform()
+    lower_bb_coord = transformed_image_corners_raw.min(0)
+    higher_bb_coord = transformed_image_corners_raw.max(0)
 
 
     img = cv2.imread(input_filename)
@@ -164,8 +166,8 @@ def handle_image(input_filename, output_filename):
     # global position of upper left corner (x, y)
     print(utm.from_latlon(cife.latitude, cife.longitude))
     x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
-    x = x + 0.5 * res
-    y = y - 0.5 * res + (bb_size[1] - lower_bb_coord[1]) * res
+    x = x + 0.5 * res - higher_bb_coord[0] * res
+    y = y - 0.5 * res + higher_bb_coord[1] * res
     transform = Affine.translation(x, y) * Affine.scale(res, -res)
     with rasterio.open(
         output_filename,
