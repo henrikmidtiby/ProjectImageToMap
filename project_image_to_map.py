@@ -41,7 +41,11 @@ class CameraInformationFromExif():
                 self.cx = float(tags["XMP:CalibratedOpticalCenterX"])
                 self.cy = float(tags["XMP:CalibratedOpticalCenterY"])
             except Exception as e: 
+                print()
+                print("=============================================")
                 print("Failed extracting exif information from image")
+                print("=============================================")
+                print()
                 print(e)
 
     def __repr__(self):
