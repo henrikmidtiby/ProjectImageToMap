@@ -10,6 +10,7 @@ pyexiftool = "*"
 matplotlib = "*"
 rasterio = "*"
 utm = "*"
+icecream = "*"
 
 [dev-packages]
 

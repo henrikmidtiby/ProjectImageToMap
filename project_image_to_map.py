@@ -6,6 +6,7 @@ import rasterio
 from rasterio.transform import Affine
 import utm
 import argparse
+from icecream import ic
 
 
 class CameraInformationFromExif():
