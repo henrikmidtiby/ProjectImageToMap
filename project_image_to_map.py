@@ -194,6 +194,10 @@ def handle_image(cife, input_filename, output_filename, gsd):
     x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
     x = x + 0.5 * res - higher_bb_coord[0] * res # East - West
     y = y - 0.5 * res + higher_bb_coord[1] * res # North - South
+    # x is east / west direction
+    x = x + 0.5 * res - bb_size[1] / 2 
+    # y is north / south direction
+    y = y - 0.5 * res + bb_size[0] / 2
     transform = Affine.translation(x, y) * Affine.scale(res, -res)
     with rasterio.open(
         output_filename,
