@@ -193,13 +193,18 @@ def main():
                         help='path to file')
     parser.add_argument('output_filename', type=str,
                         help='path to file (include .tif)')
+    parser.add_argument('--pose_image', type=str,
+                        help='Specify path to image which camera pose should be used for the projection.')
     parser.add_argument('--gsd', type=float, default=0.05, 
                         help='ground sample distance in meters')
     
     args = parser.parse_args()
 
     cife = CameraInformationFromExif()
-    cife.extract_data_from_image(args.input_filename)
+    if(args.pose_image is None):
+      cife.extract_data_from_image(args.input_filename)
+    else:
+      cife.extract_data_from_image(args.pose_image)
 
     handle_image(cife, args.input_filename, args.output_filename, args.gsd)
 
