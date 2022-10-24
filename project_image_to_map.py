@@ -106,13 +106,14 @@ class ProjectImageToGround():
     
         R_pose = np.matmul(yaw_matrix, np.matmul(pitch_matrix, roll_matrix))
     
-        hfov = 2*np.arctan(self.camera_information.image_height / 2 / self.camera_information.focallength)
-        vfov = 2*np.arctan(self.camera_information.image_width / 2 / self.camera_information.focallength)
-        im_points = np.array([[-np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
-                              [-np.tan(vfov / 2), 1, np.tan(hfov / 2)],
-                              [np.tan(vfov / 2), 1, np.tan(hfov / 2)],
-                              [np.tan(vfov / 2), 1, -np.tan(hfov / 2)],
-                              [-np.tan(vfov / 2), 1, -np.tan(hfov / 2)]])
+        iw = self.camera_information.image_width
+        ih = self.camera_information.image_height
+        dfl = 2*self.camera_information.focallength
+        im_points = np.array([[-iw / dfl, 1, -ih / dfl],
+                              [-iw / dfl, 1, ih / dfl],
+                              [iw / dfl, 1, ih / dfl],
+                              [iw / dfl, 1, -ih / dfl],
+                              [-iw / dfl, 1, -ih / dfl]])
         im_points = np.transpose(im_points)
         directions = np.matmul(R_pose, im_points)
     
