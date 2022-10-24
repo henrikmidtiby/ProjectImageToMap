@@ -145,10 +145,7 @@ class ProjectImageToGround():
 
 
 
-def handle_image(input_filename, output_filename, gsd):
-    cife = CameraInformationFromExif()
-    cife.extract_data_from_image(input_filename)
-
+def handle_image(cife, input_filename, output_filename, gsd):
     pitg = ProjectImageToGround()
     pitg.set_camera_information(cife)
     pitg.GSD = gsd
@@ -199,7 +196,11 @@ def main():
                         help='ground sample distance in meters')
     
     args = parser.parse_args()
-    handle_image(args.input_filename, args.output_filename, args.gsd)
+
+    cife = CameraInformationFromExif()
+    cife.extract_data_from_image(args.input_filename)
+
+    handle_image(cife, args.input_filename, args.output_filename, args.gsd)
 
 
 main()
