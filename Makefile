@@ -24,3 +24,13 @@ initial_test:
 	pipenv run python project_image_to_map.py input/DJI_0016.JPG output/DJI_0016.JPG
 	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177.JPG
 
+center_of_rotation_test:
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_000.JPG --yaw=0 --gsd=0.5
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_045.JPG --yaw=45 --gsd=0.5
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_090.JPG --yaw=90 --gsd=0.5
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_135.JPG --yaw=135 --gsd=0.5
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_180.JPG --yaw=180 --gsd=0.5
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_225.JPG --yaw=225 --gsd=0.5
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_270.JPG --yaw=270 --gsd=0.5
+	pipenv run python project_image_to_map.py input/DJI_0177.JPG output/DJI_0177_315.JPG --yaw=315 --gsd=0.5
+
