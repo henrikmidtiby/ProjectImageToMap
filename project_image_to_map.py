@@ -48,6 +48,30 @@ class CameraInformationFromExif():
                 print()
                 print(e)
 
+    def get_values_from_arguments(self, args):
+        if args.yaw is not None:
+          self.yaw = args.yaw
+        if args.pitch is not None:
+          self.pitch = args.pitch
+        if args.roll is not None:
+          self.roll = args.roll
+        if args.latitude is not None:
+          self.latitude = args.latitude
+        if args.longitude is not None:
+          self.longitude = args.longitude
+        if args.altitude is not None:
+          self.altitude = args.altitude
+        if args.cx is not None:
+          self.cx = args.cx
+        if args.cy is not None:
+          self.cy = args.cy
+        if args.focallength is not None:
+          self.focallength = args.focallength
+        if args.image_width is not None:
+          self.image_width = args.image_width
+        if args.image_height is not None:
+          self.image_height = args.image_height
+
     def __repr__(self):
         return f"{self.latitude} {self.longitude} {self.altitude} {self.yaw} {self.pitch:8.3f} {self.roll}"
 
@@ -197,7 +221,30 @@ def main():
                         help='Specify path to image which camera pose should be used for the projection.')
     parser.add_argument('--gsd', type=float, default=0.05, 
                         help='ground sample distance in meters')
+    parser.add_argument('--yaw', type=float,
+                        help='')
+    parser.add_argument('--pitch', type=float,
+                        help='')
+    parser.add_argument('--roll', type=float,
+                        help='')
+    parser.add_argument('--latitude', type=float,
+                        help='')
+    parser.add_argument('--longitude', type=float,
+                        help='')
+    parser.add_argument('--altitude', type=float,
+                        help='')
+    parser.add_argument('--cx', type=float,
+                        help='')
+    parser.add_argument('--cy', type=float,
+                        help='')
+    parser.add_argument('--focallength', type=float,
+                        help='')
+    parser.add_argument('--image_width', type=float,
+                        help='')
+    parser.add_argument('--image_height', type=float,
+                        help='')
     
+
     args = parser.parse_args()
 
     cife = CameraInformationFromExif()
@@ -205,6 +252,7 @@ def main():
       cife.extract_data_from_image(args.input_filename)
     else:
       cife.extract_data_from_image(args.pose_image)
+    cife.get_values_from_arguments(args)
 
     handle_image(cife, args.input_filename, args.output_filename, args.gsd)
 
