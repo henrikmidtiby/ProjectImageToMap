@@ -21,7 +21,7 @@ class CameraInformationFromExif():
 
         self.cx = None
         self.cy = None
-        self.focallength = None
+        self.focallength = 2500
         self.image_width = None
         self.image_height = None
 
