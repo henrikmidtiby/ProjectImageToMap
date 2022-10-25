@@ -189,8 +189,6 @@ def handle_image(cife, input_filename, output_filename, gsd):
     result_image_size = (int(bb_size[0]), int(bb_size[1]))
     resultimage = cv2.warpPerspective(img, resmatrix, result_image_size)
     cv2.imwrite("output/05transformed_image.jpg", resultimage)
-    result_image_rotated = cv2.rotate(resultimage, cv2.ROTATE_180)
-    cv2.imwrite("output/05transformed_image_rotated.jpg", result_image_rotated)
 
 
     Z = resultimage.transpose(2, 0, 1)
@@ -203,14 +201,10 @@ def handle_image(cife, input_filename, output_filename, gsd):
     x = x + 0.5 * res
     # y is north / south direction
     y = y - 0.5 * res
-    # Offset image so it is centered about drone position.
-    #x = x - bb_size[1] * res / 2
-    #y = y + bb_size[0] * res / 2
-
-    # This works quite well, apart from the fact that the images are shown backwards.
+    # Offset image
     x = x + lower_bb_coord[0] * res
     y = y - lower_bb_coord[1] * res
-    # Here be dragons ...
+    
     transform = Affine.translation(x, y) * Affine.scale(res, -res)
     with rasterio.open(
         output_filename,
@@ -227,7 +221,7 @@ def handle_image(cife, input_filename, output_filename, gsd):
     ) as dst:
         dst.write(Z)
 
-    
+ 
 def main():
     parser = argparse.ArgumentParser(description='Project image down to ground plane')
     parser.add_argument('input_filename', type=str,
