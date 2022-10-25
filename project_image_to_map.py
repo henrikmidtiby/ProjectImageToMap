@@ -175,14 +175,9 @@ def handle_image(cife, input_filename, output_filename, gsd):
     pitg.set_camera_information(cife)
     pitg.GSD = gsd
     resmatrix, bb_size, lower_bb_coord, transformed_image_corners_raw = pitg.calculate_projection_transform()
-    ic(bb_size)
-    ic(transformed_image_corners_raw)
     lower_bb_coord = transformed_image_corners_raw.min(0)
     higher_bb_coord = transformed_image_corners_raw.max(0)
     mean_bb_coord = transformed_image_corners_raw.mean(0)
-    ic(lower_bb_coord)
-    ic(higher_bb_coord)
-    ic(mean_bb_coord)
 
 
     img = cv2.imread(input_filename)
@@ -194,7 +189,7 @@ def handle_image(cife, input_filename, output_filename, gsd):
     Z = resultimage.transpose(2, 0, 1)
     res = pitg.GSD # Resolution
     # global position of upper left corner (x, y)
-    print(utm.from_latlon(cife.latitude, cife.longitude))
+    ic(utm.from_latlon(cife.latitude, cife.longitude))
     x, y, Number, zone = utm.from_latlon(cife.latitude, cife.longitude)
     # x is east / west direction
     # Positive direction is towards east
