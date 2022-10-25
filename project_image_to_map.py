@@ -73,7 +73,7 @@ class CameraInformationFromExif():
           self.image_height = args.image_height
 
     def __repr__(self):
-        return f"{self.latitude} {self.longitude} {self.altitude} {self.yaw} {self.pitch:8.3f} {self.roll}"
+        return f"lat={self.latitude} lon={self.longitude} alt={self.altitude} y={self.yaw:.1f} p={self.pitch:.1f} r={self.roll}"
 
 
 class ProjectImageToGround():
