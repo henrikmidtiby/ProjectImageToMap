@@ -203,8 +203,8 @@ def handle_image(cife, input_filename, output_filename, gsd):
         output_filename,
         'w',
         driver='GTiff',
-        height=Z.shape[2],
-        width=Z.shape[1],
+        height=Z.shape[1],
+        width=Z.shape[2],
         count=3,
         dtype=Z.dtype,
         crs=rasterio.crs.CRS.from_epsg(32632), # UTM 32N - This matches well here in Denmark.
