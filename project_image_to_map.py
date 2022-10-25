@@ -270,6 +270,9 @@ def main():
     else:
       cife.extract_data_from_image(args.pose_image)
     cife.get_values_from_arguments(args)
+    # Ugly hack for the projection to work properly.
+    cife.yaw = cife.yaw + 180
+    ic(cife)
 
     handle_image(cife, args.input_filename, args.output_filename, args.gsd)
 
