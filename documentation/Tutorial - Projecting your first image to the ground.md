@@ -3,10 +3,10 @@ This tutorial will describe how to use the project_image_to_map tool.
 In this tutorial we will look at how to project the image **DJI_0027.JPG** down on a planar model of the Earths surface and store the output as a georeferenced tiff file with the name **dji_0027_on_map.tif**.
 
 The input image **DJI_0027.JPG** was acquired by a DJI Phantom 4 Pro drone and looks as follows.
-![[DJI_0027.JPG]]
+![Image](pic/DJI_0027-red.JPG)
 
 And the generated georeferenced image looks like this.
-![[dji_0027_on_map.jpg]]
+![Image](pic/dji_0027_on_map.jpg)
 
 To project the input image on the ground plane the following command is used.
 ```bash
