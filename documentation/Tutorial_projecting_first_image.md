@@ -1,3 +1,4 @@
+# Tutorial - Projecting your first image to the ground
 This tutorial will describe how to use the project_image_to_map tool. 
 
 In this tutorial we will look at how to project the image **DJI_0027.JPG** down on a planar model of the Earths surface and store the output as a georeferenced tiff file with the name **dji_0027_on_map.tif**.
