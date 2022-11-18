@@ -4,8 +4,8 @@ This tool, **Project image to map** allows you to take an image and project it t
 The **Project image to map** tool was develped by Henrik Skov Midtiby as part of the project *Prototypekoncept til strandopskyl som bioressource*, that was supported by the [Future Food+Bio Resource Innovation (FFBI)](https://www.ffbi.dk/om-ffbi) in Denmark. 
 
 To install the system, the following howto can be useful
-* [Howto - Install the Project Image to Map tool](Howto_Install.md)
+* [Howto - Install the Project Image to Map tool](documentation/Howto_Install.md)
 
 After having installed the system, the next step is to follow the tutorial.
-* [Tutorial - Projecting your first image to the ground](Tutorial_projecting_first_image.md)
+* [Tutorial - Projecting your first image to the ground](documentation/Tutorial_projecting_first_image.md)
 
